@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amit Vlogs - Personal Space</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        /* Post Creator Box */
+        .post-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .post-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group textarea:focus {
+            border-color: #2a5298;
+        }
+
+        .btn {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #1e3c72;
+        }
+
+        /* Vlog Feed */
+        .feed-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #222;
+            border-left: 4px solid #2a5298;
+            padding-left: 10px;
+        }
+
+        .vlog-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .vlog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .vlog-title {
+            font-size: 1.3rem;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        .vlog-date {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .vlog-desc {
+            margin-bottom: 15px;
+            color: #444;
+            white-space: pre-line;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .delete-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Amit Vlogs</h1>
+        <p>Meri Kahani, Mere Safar, Mere Vlogs</p>
+    </header>
+
+    <div class="container">
+        <!-- Naya Vlog Dalne Ka Form -->
+        <div class="post-box">
+            <h2>+ Naya Vlog Post Karein</h2>
+            <div class="form-group">
+                <label for="vlogTitle">Vlog Ka Title</label>
+                <input type="text" id="vlogTitle" placeholder="Jaise: Mera Pehla Travel Vlog...">
+            </div>
+            <div class="form-group">
+                <label for="vlogVideo">YouTube Video Link (Optional)</label>
+                <input type="url" id="vlogVideo" placeholder="YouTube video ka link yahan paste karein...">
+            </div>
+            <div class="form-group">
+                <label for="vlogDesc">Vlog Ke Baare Mein Likhein</label>
+                <textarea id="vlogDesc" rows="4" placeholder="Aaj kya khaas hua, yahan likhein..."></textarea>
+            </div>
+            <button class="btn" onclick="addVlog()">Publish Vlog</button>
+        </div>
+
+        <!-- Vlogs Dikhane Ki Jagah -->
+        <h2 class="feed-title">Mere Latest Vlogs</h2>
+        <div id="vlogFeed"></div>
+    </div>
+
+    <footer>
+        &copy; 2026 Amit Vlogs. All rights reserved.
+    </footer>
+
+    <script>
+        // Page load hone par purane vlogs dikhana
+        document.addEventListener("DOMContentLoaded", loadVlogs);
+
+        function getYouTubeEmbedUrl(url) {
+            if (!url) return null;
+            let videoId = "";
+            if (url.includes("youtu.be/")) {
+                videoId = url.split("youtu.be/")[1].split("?")[0];
+            } else if (url.includes("youtube.com/watch?v=")) {
+                videoId = url.split("v=")[1].split("&")[0];
+            } else if (url.includes("youtube.com/shorts/")) {
+                videoId = url.split("shorts/")[1].split("?")[0];
+            }
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+        }
+
+        function addVlog() {
+            const title = document.getElementById("vlogTitle").value.trim();
+            const videoUrl = document.getElementById("vlogVideo").value.trim();
+            const desc = document.getElementById("vlogDesc").value.trim();
+
+            if (!title || !desc) {
+                alert("Kripya Vlog ka Title aur Description zaroor likhein!");
+                return;
+            }
+
+            const newVlog = {
+                id: Date.now(),
+                title: title,
+                videoUrl: getYouTubeEmbedUrl(videoUrl),
+                desc: desc,
+                date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            };
+
+            // LocalStorage mein save karna
+            let vlogs = JSON.parse(localStorage.getItem("amitVlogsData")) || [];
+            vlogs.unshift(newVlog); // Naya vlog sabse upar aayega
+            localStorage.setItem("amitVlogsData", JSON.stringify(vlogs));
+
+            // Form clear karna
+            document.getElementById("vlogTitle").value = "";
+            document.getElementById("vlogVideo").value = "";
+            document.getElementById("vlogDesc").value = "";
+
+            loadVlogs();
+        }
+
+        function loadVlogs() {
+            const feed = document.getElementById("vlogFeed");
+            let vlogs = JSON.parse(localStorage.getItem("amitVlogsData")) || [];
+
+            if (vlogs.length === 0) {
+                feed.innerHTML = "<p style='color:#666;'>Abhi tak koi vlog post nahi kiya gaya hai. Upar diye gaye form se apna pehla vlog dalein!</p>";
+                return;
+            }
+
+            feed.innerHTML = "";
+            vlogs.forEach(vlog => {
+                let videoHTML = "";
+                if (vlog.videoUrl) {
+                    videoHTML = `
+                        <div class="video-container">
+                            <iframe src="${vlog.videoUrl}" allowfullscreen></iframe>
+                        </div>
+                    `;
+                }
+
+                const card = document.createElement("div");
+                card.className = "vlog-card";
+                card.innerHTML = `
+                    <div class="vlog-header">
+                        <div class="vlog-title">${vlog.title}</div>
+                        <div class="vlog-date">${vlog.date}</div>
+                    </div>
+                    <div class="vlog-desc">${vlog.desc}</div>
+                    ${videoHTML}
+                    <button class="delete-btn" onclick="deleteVlog(${vlog.id})">Delete Post</button>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        function deleteVlog(id) {
+            if (confirm("Kya aap sach mein is vlog ko delete karna chahte hain?")) {
+                let vlogs = JSON.parse(localStorage.getItem("amitVlogsData")) || [];
+                vlogs = vlogs.filter(v => v.id !== id);
+                localStorage.setItem("amitVlogsData", JSON.stringify(vlogs));
+                loadVlogs();
+            }
+        }
+    </script>
+
+</body>
+</html>
+    

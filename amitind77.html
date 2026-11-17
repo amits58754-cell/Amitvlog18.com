@@ -1,0 +1,192 @@
+// Default Admin Password (Aap ise badal sakte hain)
+const ADMIN_PASSWORD = "amit123";
+
+// Default Sample Vlogs (Taaki pehli baar kholne par site khali na dikhe)
+const defaultVlogs = [
+    {
+        id: 101,
+        title: "Meri Pehli Personal Vlog Website Launch!",
+        category: "Tech & Gaming",
+        videoUrl: "",
+        imageUrl: "",
+        desc: "Doston, aaj maine apni khud ki personal vlog website banayi hai. Yahan main apne daily updates, travel stories aur videos share karunga.",
+        date: "17 Nov 2026",
+        likes: 12
+    },
+    {
+        id: 102,
+        title: "Subah Ki Chai Aur Gaon Ka Mausam",
+        category: "Daily Life",
+        videoUrl: "",
+        imageUrl: "",
+        desc: "Aaj subah ka mausam bahut hi shaant aur suhana tha. Thandi hawa aur ek cup garam chai ke saath din ki shuruat hui.",
+        date: "15 Nov 2026",
+        likes: 24
+    }
+];
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("amitVlogsPro")) {
+        localStorage.setItem("amitVlogsPro", JSON.stringify(defaultVlogs));
+    }
+    renderVlogs();
+});
+
+// Modal Open/Close
+function toggleAdminModal() {
+    const modal = document.getElementById("adminModal");
+    modal.style.display = modal.style.display === "block" ? "none" : "block";
+}
+
+// YouTube Link Converter
+function getYouTubeEmbedUrl(url) {
+    if (!url) return "";
+    let videoId = "";
+    if (url.includes("youtu.be/")) {
+        videoId = url.split("youtu.be/")[1].split("?")[0];
+    } else if (url.includes("youtube.com/watch?v=")) {
+        videoId = url.split("v=")[1].split("&")[0];
+    } else if (url.includes("youtube.com/shorts/")) {
+        videoId = url.split("shorts/")[1].split("?")[0];
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+}
+
+// Naya Vlog Add Karna
+function addVlog() {
+    const pass = document.getElementById("adminPass").value;
+    if (pass !== ADMIN_PASSWORD) {
+        alert("Galat Password! Naya vlog dalne ke liye sahi password dalein.");
+        return;
+    }
+
+    const title = document.getElementById("vlogTitle").value.trim();
+    const category = document.getElementById("vlogCategory").value;
+    const videoUrl = document.getElementById("vlogVideo").value.trim();
+    const imageUrl = document.getElementById("vlogImage").value.trim();
+    const desc = document.getElementById("vlogDesc").value.trim();
+
+    if (!title || !desc) {
+        alert("Title aur Description likhna zaroori hai!");
+        return;
+    }
+
+    const newVlog = {
+        id: Date.now(),
+        title: title,
+        category: category,
+        videoUrl: getYouTubeEmbedUrl(videoUrl),
+        imageUrl: imageUrl,
+        desc: desc,
+        date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        likes: 0
+    };
+
+    let vlogs = JSON.parse(localStorage.getItem("amitVlogsPro")) || [];
+    vlogs.unshift(newVlog);
+    localStorage.setItem("amitVlogsPro", JSON.stringify(vlogs));
+
+    // Form Reset
+    document.getElementById("adminPass").value = "";
+    document.getElementById("vlogTitle").value = "";
+    document.getElementById("vlogVideo").value = "";
+    document.getElementById("vlogImage").value = "";
+    document.getElementById("vlogDesc").value = "";
+
+    toggleAdminModal();
+    renderVlogs();
+}
+
+// Vlogs Screen Par Dikhana
+function renderVlogs(filteredList = null) {
+    const feed = document.getElementById("vlogFeed");
+    let vlogs = filteredList || JSON.parse(localStorage.getItem("amitVlogsPro")) || [];
+    
+    document.getElementById("totalVlogsCount").innerText = vlogs.length;
+
+    if (vlogs.length === 0) {
+        feed.innerHTML = "<div class='vlog-card'><p>Koi vlog nahi mila.</p></div>";
+        return;
+    }
+
+    feed.innerHTML = "";
+    vlogs.forEach(vlog => {
+        let mediaHTML = "";
+        if (vlog.videoUrl) {
+            mediaHTML += `
+                <div class="video-container">
+                    <iframe src="${vlog.videoUrl}" allowfullscreen></iframe>
+                </div>`;
+        }
+        if (vlog.imageUrl) {
+            mediaHTML += `<img src="${vlog.imageUrl}" alt="${vlog.title}" class="vlog-img">`;
+        }
+
+        const card = document.createElement("article");
+        card.className = "vlog-card";
+        card.innerHTML = `
+            <div class="vlog-meta">
+                <span class="badge">${vlog.category}</span>
+                <span class="vlog-date">${vlog.date}</span>
+            </div>
+            <h2 class="vlog-title">${vlog.title}</h2>
+            <p class="vlog-desc">${vlog.desc}</p>
+            ${mediaHTML}
+            <div class="card-actions">
+                <button class="like-btn" onclick="likeVlog(${vlog.id})">❤️ Like (${vlog.likes})</button>
+                <button class="delete-btn" onclick="deleteVlog(${vlog.id})">Delete</button>
+            </div>
+        `;
+        feed.appendChild(card);
+    });
+}
+
+// Search & Category Filter
+function filterVlogs() {
+    const searchText = document.getElementById("searchInput").value.toLowerCase();
+    const category = document.getElementById("categoryFilter").value;
+    let vlogs = JSON.parse(localStorage.getItem("amitVlogsPro")) || [];
+
+    const filtered = vlogs.filter(vlog => {
+        const matchesSearch = vlog.title.toLowerCase().includes(searchText) || vlog.desc.toLowerCase().includes(searchText);
+        const matchesCategory = category === "All" || vlog.category === category;
+        return matchesSearch && matchesCategory;
+    });
+
+    renderVlogs(filtered);
+}
+
+// Like Button
+function likeVlog(id) {
+    let vlogs = JSON.parse(localStorage.getItem("amitVlogsPro")) || [];
+    vlogs = vlogs.map(vlog => {
+        if (vlog.id === id) vlog.likes += 1;
+        return vlog;
+    });
+    localStorage.setItem("amitVlogsPro", JSON.stringify(vlogs));
+    renderVlogs();
+}
+
+// Delete Vlog
+function deleteVlog(id) {
+    const pass = prompt("Vlog delete karne ke liye Admin Password dalein:");
+    if (pass !== ADMIN_PASSWORD) {
+        alert("Galat Password!");
+        return;
+    }
+    let vlogs = JSON.parse(localStorage.getItem("amitVlogsPro")) || [];
+    vlogs = vlogs.filter(v => v.id !== id);
+    localStorage.setItem("amitVlogsPro", JSON.stringify(vlogs));
+    renderVlogs();
+}
+
+// Backup Download (JSON File)
+function exportVlogs() {
+    const vlogs = localStorage.getItem("amitVlogsPro");
+    const blob = new Blob([vlogs], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "amit-vlogs-backup.json";
+    a.click();
+}
